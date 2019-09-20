@@ -1,6 +1,7 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using FluentAssertions;
 
 namespace Calc.TesteMSTest
 {
@@ -14,7 +15,9 @@ namespace Calc.TesteMSTest
         public void Deve_Somar_1_com_2_e_dar_3()
         {
             //arrange
-            var calculadora = new Calculadora(new Botao { Pressionado = true });
+            var botao = new Botao(TipoBotao.LigaDesliga);
+            botao.Pressionado = true;
+            var calculadora = new Calculadora(botao);
 
             //act
             var resultado = calculadora.Somar(1, 2);
@@ -33,7 +36,8 @@ namespace Calc.TesteMSTest
         public void Deve_Somar_1_com_2_e_dar_3(int a, int b)
         {
             //arrange
-            var calculadora = new Calculadora(new Botao { Pressionado = true });
+            var botao = new Botao(TipoBotao.LigaDesliga);
+            var calculadora = new Calculadora(botao);
 
             //act
             var resultado = calculadora.Somar(a, b);
@@ -50,19 +54,21 @@ namespace Calc.TesteMSTest
         public void Deve_Dar_Erro_Ao_Ligar()
         {
             //arrange
+            var botao = new Botao(TipoBotao.LigaDesliga);
+
             //act
             //assert
-            new Calculadora(new Botao());
+            new Calculadora(botao);
         }
 
         /// <summary>
-        /// Teste com mock
+        /// Teste com mock. Setup de propriedade
         /// </summary>
         [TestMethod]
-        public void Deve_Ligar()
+        public void Deve_Ligar_Com_Mock_E_Setup_De_Propriedade()
         {
             //arrange
-            var mock = new Mock<Botao>();
+            var mock = new Mock<Botao>(TipoBotao.LigaDesliga);
             mock.Setup(x => x.Pressionado).Returns(true);
 
             //act
@@ -70,6 +76,39 @@ namespace Calc.TesteMSTest
 
             //assert
             Assert.IsNotNull(calculadora);
+        }
+
+        /// <summary>
+        /// Teste com mock com construtor
+        /// </summary>
+        [TestMethod]
+        public void Deve_Ligar()
+        {
+            //arrange
+            var mock = new Mock<Botao>(TipoBotao.LigaDesliga);
+
+            mock.Setup(x => x.Pressionado).Returns(true);
+
+            //act
+            var calculadora = new Calculadora(mock.Object);
+
+            //assert
+            Assert.IsNotNull(calculadora);
+        }
+
+        [TestMethod]
+        public void Deve_Somar_1_com_2_E_Dar_3_Usando_FluentAssertions()
+        {
+            //arrange
+            var botao = new Botao(TipoBotao.LigaDesliga);
+            botao.Pressionado = true;
+            var calculadora = new Calculadora(botao);
+
+            //act
+            var resultado = calculadora.Somar(1, 2);
+
+            //assert
+            resultado.Should().Be(3);
         }
     }
 }
